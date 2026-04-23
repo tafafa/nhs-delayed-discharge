@@ -223,7 +223,7 @@ Strong linear relationship with minimal scatter.
 **Why it matters:**  
 This is the strongest predictive signal — delayed discharges are highly persistent over time.
 
-![Delayed Discharge Over Time](output.png)
+![Delayed Discharge Over Time](charts/output.png)
 
 **What this shows:**  
 Trend of delayed discharges from 2019 to 2024.
