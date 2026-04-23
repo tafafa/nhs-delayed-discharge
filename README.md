@@ -52,13 +52,9 @@ nhs-delayed-discharge/
 ├── notebooks/
 │   └── Dissertation1.ipynb         # Full analysis notebook (EDA → ML → SHAP)
 │
-├── src/
-│   ├── preprocessing.py            # Data cleaning & feature engineering
-│   ├── eda.py                      # Exploratory data analysis functions
-│   ├── models.py                   # Model training & evaluation
-│   └── explainability.py           # SHAP analysis functions
 │
 ├── results/
+│   ├── models/
 │   └── figures/                    # All generated plots and charts
 │
 ├── docs/
@@ -171,19 +167,184 @@ See [`requirements.txt`](requirements.txt) for the full list. Key libraries:
 
 ## 📈 Key Results
 
-> Full results and figures are available in the [`results/figures/`](results/figures/) directory and the dissertation document.
+> Full results and figures are available in the [`results/figures/`](model_results/) directory and the dissertation document.
 
 | Model | MAE | RMSE | R² | CV R² |
 |-------|-----|------|----|-------|
-| Linear Regression | — | — | — | — |
-| Random Forest | — | — | — | — |
-| XGBoost | — | — | — | — |
-| Gradient Boosting | — | — | — | — |
+| Linear Regression | 291 | 501 | 0.973 | 0.928 |
+| Random Forest | 307 | 545 | 0.967 | 0.867 |
+| XGBoost | 307 | 518 | 0.971 | 0.845 |
+| Gradient Boosting | 287 | 496 | 0.973 | 0.831 |
 
-*Results to be populated after final model runs.*
+## 📊 EDA Visualisations
 
-### SHAP Findings
-SHAP analysis identified `prevmonthdelay` and `healthsocialrate` as the most influential predictors of delayed bed days, suggesting that addressing social care bottlenecks and using recent delay trends as early-warning signals could meaningfully reduce discharge delays.
+![Average by Health Board](charts/average_by_health_board.png)
+
+**What this shows:**  
+Average delayed bed days across Scottish Health Boards.
+
+**Key insight:**  
+Large urban boards (e.g. Greater Glasgow & Clyde, Lothian) have significantly higher delays compared to smaller regions like Orkney and Shetland.
+
+**Why it matters:**  
+This highlights geographic inequality and suggests that system pressure is concentrated in high-population areas.
+
+![Correlation Matrix](charts/correlation_matrix.png)
+
+**What this shows:**  
+Relationships between all features used in the model.
+
+**Key insight:**  
+`prevmonthdelay` is almost perfectly correlated with current delays (~0.99), confirming strong temporal dependence.  
+Population and care home variables also show strong positive relationships.
+
+**Why it matters:**  
+Delayed discharges are highly predictable using past trends, validating the use of time-based features.
+
+![Distribution](charts/distribution.png)
+
+**What this shows:**  
+Distribution of total delayed bed days.
+
+**Key insight:**  
+The distribution is right-skewed, with a long tail of high-delay values.
+
+**Why it matters:**  
+Extreme delay periods exist, requiring models that handle non-linear patterns (e.g. Random Forest, XGBoost).
+
+![Previous vs Total Delay](charts/prev_vs_total.png)
+
+**What this shows:**  
+Relationship between previous month delays and total delays.
+
+**Key insight:**  
+Strong linear relationship with minimal scatter.
+
+**Why it matters:**  
+This is the strongest predictive signal — delayed discharges are highly persistent over time.
+
+![Delayed Discharge Over Time](output.png)
+
+**What this shows:**  
+Trend of delayed discharges from 2019 to 2024.
+
+**Key insight:**  
+Sharp drop around 2020 (COVID disruption), followed by a steady increase and recovery.
+
+**Why it matters:**  
+Confirms external shocks affect discharge patterns and validates inclusion of temporal features.
+
+## 🤖 Model Results
+
+### Linear Regression
+
+![Actual vs Predicted](model_results/lr_prediction.png)
+![Residuals](model_results/lr_residual.png)
+
+**What this shows:**  
+A baseline linear model predicting delayed bed days.
+
+**Performance insight:**  
+Predictions follow the general trend but show wider dispersion compared to other models.
+
+**Residual analysis:**  
+Residuals are spread unevenly, with larger errors at higher values, indicating the model struggles with extreme delays.
+
+**Conclusion:**  
+Linear Regression captures the overall trend but fails to model non-linear relationships in the data.
+
+**Takeaway:**  
+Useful as a baseline, but insufficient for accurate real-world prediction.
+
+### Random Forest
+
+![Actual vs Predicted](model_results/rf_prediction.png)
+![Residuals](model_results/rf_residual.png)
+
+**What this shows:**  
+An ensemble model using multiple decision trees.
+
+**Performance insight:**  
+Predictions closely align with actual values, showing improved accuracy over linear regression.
+
+**Residual analysis:**  
+Residuals are more tightly clustered around zero, though some large errors remain at higher values.
+
+**Conclusion:**  
+Random Forest effectively captures non-linear patterns and interactions in the data.
+
+**Takeaway:**  
+A strong performer with good generalisation, suitable for practical use.
+
+### XGBoost
+
+![Actual vs Predicted](model_results/xgb_prediction.png)
+![Residuals](model_results/xgb_residual.png)
+
+**What this shows:**  
+A gradient boosting model optimised for performance.
+
+**Performance insight:**  
+Predictions show very tight alignment with actual values, indicating high accuracy.
+
+**Residual analysis:**  
+Residuals are centred around zero with relatively low variance compared to other models.
+
+**Conclusion:**  
+XGBoost provides the best balance between accuracy and stability.
+
+**Takeaway:**  
+The most reliable model for predicting delayed discharges in this project.
+
+### Gradient Boosting
+
+![Actual vs Predicted](model_results/Gradient_Boosting.png)
+![Residuals](model_results/GB_residual.png)
+
+**What this shows:**  
+A boosting model that sequentially improves prediction errors.
+
+**Performance insight:**  
+Predictions closely match actual values, similar to XGBoost.
+
+**Residual analysis:**  
+Residuals are mostly centred around zero but show some spread at higher predictions.
+
+**Conclusion:**  
+Gradient Boosting performs strongly but is slightly less stable than XGBoost.
+
+**Takeaway:**  
+A high-performing model, though marginally outperformed by XGBoost.
+
+## 🧠 Explainability (SHAP)
+![SHAP Summary](model_results/shap_summary_plot.png)
+**What this shows:**  
+How each feature affects predictions across all observations.
+
+**Key insight:**  
+- High `prevmonthdelay` strongly increases predicted delays  
+- Social care factors push predictions upward  
+- Effects are consistent across observations  
+
+**Why it matters:**  
+Provides transparent, actionable insights for NHS decision-makers.
+
+![SHAP Feature Importance](model_results/Shap_ft.png)
+**What this shows:**  
+Average contribution of each feature to model predictions.
+
+**Key insight:**  
+`prevmonthdelay` has the largest impact by a significant margin.  
+Other variables have smaller but meaningful contributions.
+
+**Why it matters:**  
+Confirms the model is driven by logical, interpretable factors.
+
+## 🔍 Feature Importance
+![Random Forest](model_results/feature_rf.png)
+![XGBoost](model_results/feature_xgb.png)
+![Gradient Boosting](model_results/feature_gb.png)
+![Linear Regression](model_results/feature_lr.png)
 
 ---
 
