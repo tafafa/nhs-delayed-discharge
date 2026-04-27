@@ -318,6 +318,7 @@ A high-performing model, though marginally outperformed by XGBoost.
 
 ## 🧠 Explainability (SHAP)
 ![SHAP Summary](model_results/shap_summary_plot.png)
+
 **What this shows:**  
 How each feature affects predictions across all observations.
 
@@ -330,6 +331,7 @@ How each feature affects predictions across all observations.
 Provides transparent, actionable insights for NHS decision-makers.
 
 ![SHAP Feature Importance](model_results/Shap_ft.png)
+
 **What this shows:**  
 Average contribution of each feature to model predictions.
 
