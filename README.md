@@ -382,4 +382,4 @@ Student ID: B01818359
 ## 🙏 Acknowledgements
 
 Supervised by **Md Shakil Amid**, School of Computing, University of the West of Scotland.  
-Special thanks to Mrs Rolanda Ayisa Cudjoe for her unwavering support throughout this degree.
+Special thanks to Mrs Rolanda Ayisa Anthonio for her unwavering support throughout this degree.
